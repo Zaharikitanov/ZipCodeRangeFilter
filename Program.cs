@@ -22,7 +22,7 @@ namespace PostalCodeRangeFilter
 
             var addresses = ProcessFile(csv_file_path);
 
-            var filteredAddresses = RangeFilter(20, addresses);
+            var filteredAddresses = RangeFilter(_startPositionLatitude, _startPositionLongitude, 20, addresses);
 
             foreach (var address in filteredAddresses)
             {
@@ -30,7 +30,6 @@ namespace PostalCodeRangeFilter
                 var endLocation = new GeoCoordinate(address.Lat, address.Lng);
                 Console.WriteLine($"Distance from Freiburg to {address.City} is {Math.Round(startLocation.GetDistanceTo(endLocation)/1000, 1)} km");
             }
-
         }
 
         private static List<AddressDetails> ProcessFile(string path)
@@ -42,13 +41,13 @@ namespace PostalCodeRangeFilter
                 .ToList();
         }
 
-        private static List<AddressDetails> RangeFilter(int range, List<AddressDetails> addressList)
+        private static List<AddressDetails> RangeFilter(double startLocationLat, double startLocationLng, int range, List<AddressDetails> addressList)
         {
             var filteredList = new List<AddressDetails>();
 
             foreach (var address in addressList)
             {
-                var startLocation = new GeoCoordinate(_startPositionLatitude, _startPositionLongitude);
+                var startLocation = new GeoCoordinate(startLocationLat, startLocationLng);
                 var endLocation = new GeoCoordinate(address.Lat, address.Lng);
 
                 if (range >= Math.Round(startLocation.GetDistanceTo(endLocation) / 1000, 1))
