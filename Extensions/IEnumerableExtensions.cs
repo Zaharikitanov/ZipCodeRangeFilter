@@ -16,11 +16,7 @@ namespace PostalCodeRangeFilter.Extensions
                     Zip_code = int.Parse(columns[0]),
                     City = columns[1],
                     Lat = double.Parse(columns[2]),
-                    Lng = double.Parse(columns[3]),
-                    Ne_lat = double.Parse(columns[4]),
-                    Ne_lng = double.Parse(columns[5]),
-                    Sw_lat = double.Parse(columns[6]),
-                    Sw_lng = double.Parse(columns[7])
+                    Lng = double.Parse(columns[3])
                 };
             }
         }

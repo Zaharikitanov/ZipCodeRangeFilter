@@ -11,6 +11,9 @@ namespace PostalCodeRangeFilter
 {
     class Program
     {
+        private static double _startPositionLatitude = 48.4847;
+        private static double _startPositionLongitude = 8.02459;
+
         static void Main(string[] args)
         {
             var workingDirectory = Environment.CurrentDirectory;
@@ -23,7 +26,7 @@ namespace PostalCodeRangeFilter
 
             foreach (var address in filteredAddresses)
             {
-                var startLocation = new GeoCoordinate(47.6064, 8.16714);
+                var startLocation = new GeoCoordinate(_startPositionLatitude, _startPositionLongitude);
                 var endLocation = new GeoCoordinate(address.Lat, address.Lng);
                 Console.WriteLine($"Distance from Freiburg to {address.City} is {Math.Round(startLocation.GetDistanceTo(endLocation)/1000, 1)} km");
             }
@@ -45,7 +48,7 @@ namespace PostalCodeRangeFilter
 
             foreach (var address in addressList)
             {
-                var startLocation = new GeoCoordinate(47.9908, 7.70853);
+                var startLocation = new GeoCoordinate(_startPositionLatitude, _startPositionLongitude);
                 var endLocation = new GeoCoordinate(address.Lat, address.Lng);
 
                 if (range >= Math.Round(startLocation.GetDistanceTo(endLocation) / 1000, 1))
