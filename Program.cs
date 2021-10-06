@@ -11,43 +11,48 @@ namespace PostalCodeRangeFilter
 {
     class Program
     {
-        private static double _startPositionLatitude = 48.4847;
-        private static double _startPositionLongitude = 8.02459;
+        private static string workingDirectory = Environment.CurrentDirectory;
+        private static string projectDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
+        private static string csv_file_path = $"{projectDirectory}\\zip_codes_de_10km.csv";
 
         static void Main(string[] args)
         {
-            var workingDirectory = Environment.CurrentDirectory;
-            var projectDirectory = Directory.GetParent(workingDirectory).Parent.FullName; ;
-            var csv_file_path = $"{projectDirectory}\\zip_codes_de_10km.csv";
+            var addresses = GetAddressesFromFileAsync();
+            Console.WriteLine($"Total addresses are: {addresses.Count()}");
 
-            var addresses = ProcessFile(csv_file_path);
-
-            var filteredAddresses = RangeFilter(_startPositionLatitude, _startPositionLongitude, 20, addresses);
-
-            foreach (var address in filteredAddresses)
-            {
-                var startLocation = new GeoCoordinate(_startPositionLatitude, _startPositionLongitude);
-                var endLocation = new GeoCoordinate(address.Lat, address.Lng);
-                Console.WriteLine($"Distance from Freiburg to {address.City} is {Math.Round(startLocation.GetDistanceTo(endLocation)/1000, 1)} km");
-            }
+            var addressesInRange = AddressesInRange("30171", 15);
+            Console.WriteLine($"Total addresses in range are: {addressesInRange.Count()}");
         }
 
-        private static List<AddressDetails> ProcessFile(string path)
+        public static AddressDetails GetOneAsync(string zipCode)
         {
-            return File.ReadAllLines(path)
+            var addresses = GetAddressesFromFileAsync();
+
+            return addresses.SingleOrDefault(z => z.Zip_code == zipCode);
+        }
+
+        private static List<AddressDetails> GetAddressesFromFileAsync()
+        {
+            var lines = File.ReadAllLines(csv_file_path);
+
+            return lines
                 .Skip(1)
                 .Where(line => line.Length > 1)
                 .ToAddress()
+                .OrderBy(x => x.City)
                 .ToList();
         }
 
-        private static List<AddressDetails> RangeFilter(double startLocationLat, double startLocationLng, int range, List<AddressDetails> addressList)
+        private static List<AddressDetails> AddressesInRange(string zipCode, int range)
         {
+            var addresses = GetAddressesFromFileAsync();
+            var originZipCode = addresses.SingleOrDefault(z => z.Zip_code == zipCode);
+
             var filteredList = new List<AddressDetails>();
 
-            foreach (var address in addressList)
+            foreach (var address in addresses)
             {
-                var startLocation = new GeoCoordinate(startLocationLat, startLocationLng);
+                var startLocation = new GeoCoordinate(originZipCode.Lat, originZipCode.Lng);
                 var endLocation = new GeoCoordinate(address.Lat, address.Lng);
 
                 if (range >= Math.Round(startLocation.GetDistanceTo(endLocation) / 1000, 1))

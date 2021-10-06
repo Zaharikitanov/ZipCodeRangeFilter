@@ -13,7 +13,7 @@ namespace PostalCodeRangeFilter.Extensions
 
                 yield return new AddressDetails
                 {
-                    Zip_code = int.Parse(columns[0]),
+                    Zip_code = columns[0],
                     City = columns[1],
                     Lat = double.Parse(columns[2]),
                     Lng = double.Parse(columns[3])
